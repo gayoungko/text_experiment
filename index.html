@@ -1,25 +1,76 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>My Experiment</title>
+<head>
+    <title>Stroop Task</title>
     <script src="https://unpkg.com/jspsych@7.3.4"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@
-1.2.0"></script>
-        <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css"
-rel="stylesheet" type="text/css" />
-    </head>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.4"></script>
+    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body></body>
+<script>
+    
+    const jsPsych = initJsPsych({
+        on_finish: function() {
+            jsPsych.data.displayData(); 
+        }
+    });
 
-    <body></body>
+    const timeline_variables = [
+        { stimulus: "<p style='color:red;'>RED</p>", data: { word: "red", color: "red", congruent: true } },
+        { stimulus: "<p style='color:red;'>RED</p>", data: { word: "red", color: "red", congruent: true } },  // Second time
+        { stimulus: "<p style='color:blue;'>RED</p>", data: { word: "red", color: "blue", congruent: false } },
+        { stimulus: "<p style='color:blue;'>RED</p>", data: { word: "red", color: "blue", congruent: false } },  
+        { stimulus: "<p style='color:green;'>RED</p>", data: { word: "red", color: "green", congruent: false } },
+        { stimulus: "<p style='color:green;'>RED</p>", data: { word: "red", color: "green", congruent: false } }, 
+        { stimulus: "<p style='color:red;'>BLUE</p>", data: { word: "blue", color: "red", congruent: false } },
+        { stimulus: "<p style='color:red;'>BLUE</p>", data: { word: "blue", color: "red", congruent: false } },  
+        { stimulus: "<p style='color:blue;'>BLUE</p>", data: { word: "blue", color: "blue", congruent: true } },
+        { stimulus: "<p style='color:blue;'>BLUE</p>", data: { word: "blue", color: "blue", congruent: true } }, 
+        { stimulus: "<p style='color:green;'>BLUE</p>", data: { word: "blue", color: "green", congruent: false } },
+        { stimulus: "<p style='color:green;'>BLUE</p>", data: { word: "blue", color: "green", congruent: false } }, 
+        { stimulus: "<p style='color:red;'>GREEN</p>", data: { word: "green", color: "red", congruent: false } },
+        { stimulus: "<p style='color:red;'>GREEN</p>", data: { word: "green", color: "red", congruent: false } },  
+        { stimulus: "<p style='color:blue;'>GREEN</p>", data: { word: "green", color: "blue", congruent: false } },
+        { stimulus: "<p style='color:blue;'>GREEN</p>", data: { word: "green", color: "blue", congruent: false } },  
+        { stimulus: "<p style='color:green;'>GREEN</p>", data: { word: "green", color: "green", congruent: true } },
+        { stimulus: "<p style='color:green;'>GREEN</p>", data: { word: "green", color: "green", congruent: true } }  
+    ];
 
-    <script>
-        const jsPsych = initJsPsych();
 
-        const just_one_trial = {
-            type: jsPsychHtmlButtonResponse,
-            choices: ['Ok'],
-            stimulus: "Trial 1: Click Ok to end the experiment."
-        };
+    const ready_screen = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: 'Press any key when ready for the next trial'
+    };
 
-        jsPsych.run([just_one_trial]);
-    </script>
+
+    const stroop_trial = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: jsPsych.timelineVariable('stimulus'),
+        choices: ['MATCH', 'NOT'],
+        data: jsPsych.timelineVariable('data')
+    };
+
+    const trial_procedure = {
+        timeline: [ready_screen, stroop_trial],
+        timeline_variables: timeline_variables,
+        randomize_order: true
+    };
+
+
+    const save_data_trial = {
+        type: jsPsychPipe,
+        action: "save",
+        experiment_id: "Lps9Ilbqnci2",  // Replace with your experiment ID!
+        filename: "stroop_data.csv",
+        data_string: ()=>jsPsych.data.get().csv()
+    };
+
+    const timeline = [trial_procedure, save_data_trial];
+
+    jsPsych.run(timeline);
+</script>
+
 </html>
